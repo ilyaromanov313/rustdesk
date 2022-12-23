@@ -1,0 +1,18 @@
+msgbox("custom", "Note", 
+  <div .form>
+    <textarea .outline-focus spellcheck="false" name="text" novalue="input note here" style="overflow: scroll-indicator; width:*; height: 140px; font-size: 1.2em; padding: 0.5em;"></textarea>
+  </div>, "", 
+  function(res=null) {
+
+    if (!res) return;
+    if (!res.text) return;
+
+    handler.send_note(res.text);
+
+    //handler.post_request(handler.get_api_server() + "/api/audit",
+    // JSON.stringify({
+    //   "uid": globalThis["uidCommentEnter"],
+    //   "note": res.text
+    // }), "");
+  }, 
+  280);

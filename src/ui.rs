@@ -132,6 +132,10 @@ pub fn start(args: &mut [String]) {
             ))
         });
         page = "remote.html";
+    } else if args.len() == 2 && args[0] == "--comment-enter" {
+        page = "write_comment.html";
+        frame.set_title("Comment");
+        frame.event_handler(UIComment { uid: args[1].clone() });
     } else {
         log::error!("Wrong command: {:?}", args);
         return;
@@ -158,6 +162,26 @@ pub fn start(args: &mut [String]) {
         page
     ));
     frame.run_app();
+}
+
+struct UIComment {
+    uid: String
+}
+
+impl UIComment {
+    fn send_note(&self, note: String) {
+        let body = serde_json::json!({ "uid": &self.uid, "note": note });
+        let url = format!("{}/api/audit", get_api_server());
+        std::thread::spawn(move || {
+            crate::post_request(url, body.to_string(), "");
+        });
+    }
+}
+
+impl sciter::EventHandler for UIComment {
+    sciter::dispatch_script_call! {
+        fn send_note(String);
+    }
 }
 
 struct UI {}
@@ -548,6 +572,11 @@ impl UI {
     fn default_video_save_directory(&self) -> String {
         default_video_save_directory()
     }
+
+    fn print_debug(&self, info: String) {
+        log::info!("{}", info);
+    }
+
 }
 
 impl sciter::EventHandler for UI {
@@ -633,6 +662,7 @@ impl sciter::EventHandler for UI {
         fn has_hwcodec();
         fn get_langs();
         fn default_video_save_directory();
+        fn print_debug(String);
     }
 }
 

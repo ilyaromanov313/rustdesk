@@ -33,6 +33,7 @@ use std::sync::atomic::Ordering;
 use std::sync::{atomic::AtomicI64, mpsc as std_mpsc};
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 use system_shutdown;
+use uuid::Uuid;
 
 pub type Sender = mpsc::UnboundedSender<(Instant, Arc<Message>)>;
 
@@ -98,6 +99,7 @@ pub struct Connection {
     last_recv_time: Arc<Mutex<Instant>>,
     chat_unanswered: bool,
     close_manually: bool,
+    uid: Uuid
 }
 
 impl Subscriber for ConnInner {
@@ -189,6 +191,7 @@ impl Connection {
             last_recv_time: Arc::new(Mutex::new(Instant::now())),
             chat_unanswered: false,
             close_manually: false,
+            uid: Uuid::new_v4()
         };
         #[cfg(not(any(target_os = "android", target_os = "ios")))]
         tokio::spawn(async move {
@@ -673,6 +676,7 @@ impl Connection {
         v["id"] = json!(Config::get_id());
         v["uuid"] = json!(base64::encode(hbb_common::get_uuid()));
         v["Id"] = json!(self.inner.id);
+        v["uid"] = json!(self.uid.to_string());
         tokio::spawn(async move {
             allow_err!(Self::post_audit_async(url, v).await);
         });
@@ -1532,6 +1536,10 @@ impl Connection {
         let data = ipc::Data::Close;
         self.tx_to_cm.send(data).ok();
         self.port_forward_socket.take();
+
+        crate::run_me(vec!["--comment-enter", self.uid.to_string().as_str()])
+            .expect("opening comment enter is falied");
+
     }
 
     async fn on_close_manually(&mut self, close_from: &str) {
