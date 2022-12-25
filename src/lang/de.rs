@@ -39,6 +39,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Change ID", "ID ändern"),
         ("Website", "Webseite"),
         ("About", "Über"),
+        ("About RustDesk", "Über RustDesk"),
+        ("Slogan_tip", "Mit Herzblut programmiert - in einer Welt, die im Chaos versinkt"),
+        ("Privacy Statement", "Datenschutz"),
         ("Mute", "Stummschalten"),
         ("Audio Input", "Audioeingang"),
         ("Enhancements", "Verbesserungen"),
@@ -56,7 +59,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Too frequent", "Zu häufig"),
         ("Cancel", "Abbrechen"),
         ("Skip", "Überspringen"),
-        ("Close", "Sitzung beenden"),
+        ("Close", "Schließen"),
         ("Retry", "Erneut versuchen"),
         ("OK", "OK"),
         ("Password Required", "Passwort erforderlich"),
@@ -301,7 +304,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("android_open_battery_optimizations_tip", "Möchten Sie die Einstellungen zur Batterieopimierung öffnen?"),
         ("Connection not allowed", "Verbindung abgelehnt"),
         ("Legacy mode", "Kompatibilitätsmodus"),
-        ("Map mode", ""), //Muss noch angepasst werden
+        ("Map mode", ""), //Muss noch angepasst wer"),
         ("Translate mode", "Übersetzungsmodus"),
         ("Use permanent password", "Permanentes Passwort verwenden"),
         ("Use both passwords", "Beide Passwörter verwenden"),
@@ -358,7 +361,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Unpin menubar", "Menüleiste lösen"),
         ("Recording", "Aufnahme"),
         ("Directory", "Verzeichnis"),
-        ("Automatically record incoming sessions", "Automatische Aufzeichnung eingehender Sitzungen"),
+        ("Automatically record incoming sessions", "Eingehende Sitzungen automatisch aufzeichnen"),
         ("Change", "Ändern"),
         ("Start session recording", "Sitzungsaufzeichnung starten"),
         ("Stop session recording", "Sitzungsaufzeichnung beenden"),
@@ -367,9 +370,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Enable LAN Discovery", "LAN-Erkennung aktivieren"),
         ("Deny LAN Discovery", "LAN-Erkennung verbieten"),
         ("Write a message", "Nachricht schreiben"),
-        ("Prompt", ""), //Aufforderung?
+        ("Prompt", ""), //Aufforderung???
         ("Please wait for confirmation of UAC...", "Bitte auf die Bestätigung des Nutzers warten..."),
-        ("elevated_foreground_window_tip", ""),
+        ("elevated_foreground_window_tip", "Das aktuell geöffnete Fenster des ferngesteuerten Computers benötigt höhere Rechte. Deshalb ist es derzeit nicht möglich, die Maus und die Tastatur zu verwenden. Bitten Sie den Nutzer, dessen Computer Sie fernsteuern, das Fenster zu minimieren oder die Rechte zu erhöhen. Um dieses Problem zunünftig zu vermeiden, wird empfohlen, die Software auf dem ferngesteuerten Computer zu installieren."),
         ("Disconnected", "Verbindung abgebrochen"),
         ("Other", "Weitere Einstellungen"),
         ("Confirm before closing multiple tabs", "Nachfragen, wenn mehrere Tabs geschlossen werden"),
@@ -396,6 +399,11 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("One-time password length", "Länge des Einmalpassworts"),
         ("Request access to your device", "Zugriff zu Ihrem Gerät erbitten"),
         ("Hide connection management window", "Fenster zur Verwaltung der Verbindung verstecken"),
-        ("hide_cm_tip", "Dies ist nur möglich, wenn der Zugriff nur über ein permanentes Passwort erfolgt."), // Sehr unklar. Muss noch angepasst werden. Original: Allow hiding only if accepting sessions via password and using pernament password
+        ("hide_cm_tip", "Dies ist nur möglich, wenn der Zugriff nur über ein permanentes Passwort erfolgt."),
+        ("wayland_experiment_tip", "Die Unterstützung von Wayland ist nur experimentell. Bitte nutzen Sie X11, wenn Sie einen unbeaufsichtigten Zugriff benötigen."),
+        ("Right click to select tabs", "Register mit rechtem Mausklick auswählen"),
+        ("Add to Address Book", "Zum Adressbuch hinzufügen"),
+        ("Group", "Gruppe"),
+        ("Search", "Suchen"),
     ].iter().cloned().collect();
 }

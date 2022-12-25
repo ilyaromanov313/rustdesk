@@ -6,8 +6,6 @@ use cpal::{
 };
 use magnum_opus::{Channels::*, Decoder as AudioDecoder};
 use sha2::{Digest, Sha256};
-#[cfg(any(target_os = "android", target_os = "ios", feature = "flutter"))]
-use std::sync::atomic::Ordering;
 use std::{
     collections::HashMap,
     net::SocketAddr,
@@ -49,10 +47,7 @@ pub use super::lang::*;
 pub mod file_trait;
 pub mod helper;
 pub mod io_loop;
-use crate::{
-    server::video_service::{SCRAP_X11_REF_URL, SCRAP_X11_REQUIRED},
-    ui_session_interface::global_save_keyboard_mode,
-};
+use crate::server::video_service::{SCRAP_X11_REF_URL, SCRAP_X11_REQUIRED};
 pub static SERVER_KEYBOARD_ENABLED: AtomicBool = AtomicBool::new(true);
 pub static SERVER_FILE_TRANSFER_ENABLED: AtomicBool = AtomicBool::new(true);
 pub static SERVER_CLIPBOARD_ENABLED: AtomicBool = AtomicBool::new(true);
@@ -863,12 +858,14 @@ impl VideoHandler {
         self.record = false;
         if start {
             self.recorder = Recorder::new(RecorderContext {
+                server: false,
                 id,
                 default_dir: crate::ui_interface::default_video_save_directory(),
                 filename: "".to_owned(),
                 width: w as _,
                 height: h as _,
                 codec_id: scrap::record::RecordCodecID::VP9,
+                tx: None,
             })
             .map_or(Default::default(), |r| Arc::new(Mutex::new(Some(r))));
         } else {
@@ -895,6 +892,8 @@ pub struct LoginConfigHandler {
     pub supported_encoding: Option<(bool, bool)>,
     pub restarting_remote_device: bool,
     pub force_relay: bool,
+    pub direct: Option<bool>,
+    pub received: bool,
 }
 
 impl Deref for LoginConfigHandler {
@@ -932,6 +931,8 @@ impl LoginConfigHandler {
         self.supported_encoding = None;
         self.restarting_remote_device = false;
         self.force_relay = !self.get_option("force-always-relay").is_empty();
+        self.direct = None;
+        self.received = false;
     }
 
     /// Check if the client should auto login.
@@ -984,6 +985,17 @@ impl LoginConfigHandler {
     pub fn save_view_style(&mut self, value: String) {
         let mut config = self.load_config();
         config.view_style = value;
+        self.save_config(config);
+    }
+
+    /// Save keyboard mode to the current config.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The view style to be saved.
+    pub fn save_keyboard_mode(&mut self, value: String) {
+        let mut config = self.load_config();
+        config.keyboard_mode = value;
         self.save_config(config);
     }
 
@@ -1380,9 +1392,6 @@ impl LoginConfigHandler {
         if !pi.version.is_empty() {
             self.version = hbb_common::get_version_number(&pi.version);
         }
-        if hbb_common::get_version_number(&pi.version) < hbb_common::get_version_number("1.2.0") {
-            global_save_keyboard_mode("legacy".to_owned());
-        }
         self.features = pi.features.clone().into_option();
         let serde = PeerInfoSerde {
             username: pi.username.clone(),
@@ -1403,6 +1412,14 @@ impl LoginConfigHandler {
             if !password0.is_empty() {
                 config.password = Default::default();
                 log::debug!("remove password of {}", self.id);
+            }
+        }
+        if config.keyboard_mode == "" {
+            if hbb_common::get_version_number(&pi.version) < hbb_common::get_version_number("1.2.0")
+            {
+                config.keyboard_mode = "legacy".to_string();
+            } else {
+                config.keyboard_mode = "map".to_string();
             }
         }
         self.conn_id = pi.conn_id;
@@ -1802,6 +1819,7 @@ pub trait Interface: Send + Clone + 'static + Sized {
     fn handle_login_error(&mut self, err: &str) -> bool;
     fn handle_peer_info(&mut self, pi: PeerInfo);
     fn set_force_relay(&mut self, direct: bool, received: bool);
+    fn set_connection_info(&mut self, direct: bool, received: bool);
     fn is_file_transfer(&self) -> bool;
     fn is_port_forward(&self) -> bool;
     fn is_rdp(&self) -> bool;
@@ -1977,11 +1995,10 @@ lazy_static::lazy_static! {
 /// * `title` - The title of the message.
 /// * `text` - The text of the message.
 #[inline]
-pub fn check_if_retry(msgtype: &str, title: &str, text: &str) -> bool {
+pub fn check_if_retry(msgtype: &str, title: &str, text: &str, retry_for_relay: bool) -> bool {
     msgtype == "error"
         && title == "Connection Error"
-        && (text.contains("10054")
-            || text.contains("104")
+        && ((text.contains("10054") || text.contains("104")) && retry_for_relay
             || (!text.to_lowercase().contains("offline")
                 && !text.to_lowercase().contains("exist")
                 && !text.to_lowercase().contains("handshake")
@@ -1989,7 +2006,8 @@ pub fn check_if_retry(msgtype: &str, title: &str, text: &str) -> bool {
                 && !text.to_lowercase().contains("resolve")
                 && !text.to_lowercase().contains("mismatch")
                 && !text.to_lowercase().contains("manually")
-                && !text.to_lowercase().contains("not allowed")))
+                && !text.to_lowercase().contains("not allowed")
+                && !text.to_lowercase().contains("reset by the peer")))
 }
 
 #[inline]
@@ -2021,9 +2039,4 @@ fn decode_id_pk(signed: &[u8], key: &sign::PublicKey) -> ResultType<(String, [u8
     } else {
         bail!("Wrong public length");
     }
-}
-
-#[cfg(any(target_os = "android", target_os = "ios", feature = "flutter"))]
-pub fn disable_keyboard_listening() {
-    crate::ui_session_interface::KEYBOARD_HOOKED.store(true, Ordering::SeqCst);
 }

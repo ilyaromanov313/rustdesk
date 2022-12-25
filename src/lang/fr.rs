@@ -39,6 +39,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Change ID", "Changer d'ID"),
         ("Website", "Site Web"),
         ("About", "À propos de"),
+        ("About RustDesk", "À propos de RustDesk"),
+        ("Slogan_tip", "Fait avec cœur dans ce monde chaotique!"),
+        ("Privacy Statement", "Déclaration de confidentialité"),
         ("Mute", "Muet"),
         ("Audio Input", "Entrée audio"),
         ("Enhancements", "Améliorations"),
@@ -397,5 +400,10 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Request access to your device", "Demande d'accès à votre appareil"),
         ("Hide connection management window", "Masquer la fenêtre de gestion des connexions"),
         ("hide_cm_tip", "Autoriser le masquage uniquement si vous acceptez des sessions via un mot de passe et utilisez un mot de passe permanent"),
+        ("wayland_experiment_tip", ""),
+        ("Right click to select tabs", ""),
+        ("Add to Address Book", "Ajouter au carnet d'adresses"),
+        ("Group", "Groupe"),
+        ("Search", "Rechercher"),
     ].iter().cloned().collect();
 }

@@ -39,6 +39,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Change ID", "Thay đổi ID"),
         ("Website", "Trang web"),
         ("About", "About"),
+        ("About RustDesk", ""),
+        ("Slogan_tip", ""),
+        ("Privacy Statement", ""),
         ("Mute", "Tắt tiếng"),
         ("Audio Input", "Đầu vào âm thanh"),
         ("Enhancements", "Các tiện itchs"),
@@ -397,5 +400,10 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Request access to your device", ""),
         ("Hide connection management window", ""),
         ("hide_cm_tip", ""),
+        ("wayland_experiment_tip", ""),
+        ("Right click to select tabs", ""),
+        ("Add to Address Book", ""),
+        ("Group", ""),
+        ("Search", ""),
     ].iter().cloned().collect();
 }

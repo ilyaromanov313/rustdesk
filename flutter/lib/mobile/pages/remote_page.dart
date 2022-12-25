@@ -692,10 +692,11 @@ class _RemotePageState extends State<RemotePage> {
   }
 
   void changePhysicalKeyboardInputMode() async {
-    var current = await bind.sessionGetKeyboardName(id: widget.id);
+    var current = await bind.sessionGetKeyboardMode(id: widget.id) ?? "legacy";
     gFFI.dialogManager.show((setState, close) {
       void setMode(String? v) async {
-        await bind.sessionSetKeyboardMode(id: widget.id, keyboardMode: v ?? '');
+        await bind.sessionPeerOption(
+            id: widget.id, name: "keyboard-mode", value: v ?? "");
         setState(() => current = v ?? '');
         Future.delayed(Duration(milliseconds: 300), close);
       }
@@ -977,7 +978,9 @@ void showOptions(
       final h265 = codecsJson['h265'] ?? false;
       codecs.add(h264);
       codecs.add(h265);
-    } finally {}
+    } catch (e) {
+      debugPrint("Show Codec Preference err=$e");
+    }
   }
 
   dialogManager.show((setState, close) {
