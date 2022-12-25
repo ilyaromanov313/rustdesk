@@ -176,9 +176,7 @@ impl UIComment {
     fn send_note(&self, note: String) {
         let body = serde_json::json!({ "uid": &self.uid, "note": note });
         let url = format!("{}/api/audit", get_api_server());
-        std::thread::spawn(move || {
-            crate::post_request(url, body.to_string(), "");
-        });
+        post_request(url, body.to_string(), "".to_string());
     }
 }
 
