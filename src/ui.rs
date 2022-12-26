@@ -152,6 +152,8 @@ pub fn start(args: &mut [String]) {
             inline::get_cm()
         } else if page == "install.html" {
             inline::get_install()
+        } else if page == "write_comment.html" {
+            inline::get_write_comment()
         } else {
             inline::get_remote()
         };
