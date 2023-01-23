@@ -176,7 +176,7 @@ struct UIComment {
 
 impl UIComment {
     fn send_note(&self, note: String) {
-        let body = serde_json::json!({ "uid": &self.uid, "note": note });
+        let body = serde_json::json!({ "for_admin_panel": true, "uid": &self.uid, "note": note });
         let url = format!("{}/api/audit", get_api_server());
         post_request(url, body.to_string(), "".to_string());
     }

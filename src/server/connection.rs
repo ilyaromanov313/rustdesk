@@ -665,17 +665,17 @@ impl Connection {
     }
 
     fn post_audit(&self, v: Value) {
-        if self.api_server.is_empty() {
-            return;
-        }
-        let url = self.api_server.clone();
-        let mut v = v;
-        v["id"] = json!(Config::get_id());
-        v["uuid"] = json!(base64::encode(hbb_common::get_uuid()));
-        v["Id"] = json!(self.inner.id);
-        tokio::spawn(async move {
-            allow_err!(Self::post_audit_async(url, v).await);
-        });
+        // if self.api_server.is_empty() {
+        //     return;
+        // }
+        // let url = self.api_server.clone();
+        // let mut v = v;
+        // v["id"] = json!(Config::get_id());
+        // v["uuid"] = json!(base64::encode(hbb_common::get_uuid()));
+        // v["Id"] = json!(self.inner.id);
+        // tokio::spawn(async move {
+        //     allow_err!(Self::post_audit_async(url, v).await);
+        // });
     }
 
     #[inline]
@@ -1539,10 +1539,6 @@ impl Connection {
         let data = ipc::Data::Close;
         self.tx_to_cm.send(data).ok();
         self.port_forward_socket.take();
-
-//        crate::run_me(vec!["--comment-enter", self.uid.to_string().as_str()])
-//            .expect("opening comment enter is falied");
-
     }
 
     async fn on_close_manually(&mut self, close_from: &str) {

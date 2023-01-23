@@ -935,6 +935,9 @@ impl LoginConfigHandler {
         self.received = false;
     }
 
+    pub fn get_session_id(&self) -> u64 {
+        self.session_id.clone()
+    }
     /// Check if the client should auto login.
     /// Return password if the client should auto login, otherwise return empty string.
     pub fn should_auto_login(&self) -> String {

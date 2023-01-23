@@ -418,6 +418,7 @@ impl sciter::EventHandler for SciterSession {
         fn supported_hwcodec();
         fn change_prefer_codec();
         fn restart_remote_device();
+        fn send_end_time_and_open_comment();
     }
 }
 

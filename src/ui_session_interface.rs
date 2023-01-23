@@ -571,6 +571,28 @@ impl<T: InvokeUiSession> Session<T> {
         }
         self.update_transfer_list();
     }
+
+    pub fn send_end_time_and_open_comment(&self) {
+         
+        let session_id = &self.lc.read().unwrap().get_session_id();
+        
+        let dt: chrono::DateTime<chrono::Utc> = std::time::SystemTime::now().clone().into();
+        let time_end = format!("{}", dt.format("%+"));
+        
+        let body = serde_json::json!({
+            "for_admin_panel": true,
+            "uid": session_id.to_string(),
+            "time_end": time_end
+        });
+        
+        crate::common::post_request_sync(crate::ui_interface::get_api_server() + "/api/audit", body.to_string(), "")
+            .expect("fail to post time end");
+
+        crate::run_me(vec!["--comment-enter", session_id.to_string().as_str()])
+            .expect("opening comment enter is falied");
+
+    }
+
 }
 
 pub trait InvokeUiSession: Send + Sync + Clone + 'static + Sized + Default {
@@ -717,6 +739,15 @@ impl<T: InvokeUiSession> Interface for Session<T> {
             );
         }
         self.on_connected(self.lc.read().unwrap().conn_type);
+        let body = serde_json::json!({
+            "for_admin_panel": true,
+            "uid": self.lc.write().unwrap().get_session_id(),
+            "id_who": Config::get_id(),
+            "id_to_whom": self.id
+        });
+        std::thread::spawn(move || {
+            send_json(crate::ui_interface::get_api_server() + "/api/audit", body);
+        });
         #[cfg(windows)]
         {
             let mut path = std::env::temp_dir();
@@ -931,4 +962,9 @@ async fn start_one_port_forward<T: InvokeUiSession>(
 async fn send_note(url: String, id: String, conn_id: i32, note: String) {
     let body = serde_json::json!({ "id": id, "Id": conn_id, "note": note });
     allow_err!(crate::post_request(url, body.to_string(), "").await);
+}
+
+#[tokio::main(flavor = "current_thread")]
+async fn send_json(url: String, body: serde_json::Value) {
+    crate::post_request(url, body.to_string(), "").await.expect("WTF send_json");
 }
