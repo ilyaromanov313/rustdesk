@@ -573,16 +573,13 @@ impl<T: InvokeUiSession> Session<T> {
     }
 
     pub fn send_end_time_and_open_comment(&self) {
-         
+
         let session_id = &self.lc.read().unwrap().get_session_id();
-        
-        let dt: chrono::DateTime<chrono::Utc> = std::time::SystemTime::now().clone().into();
-        let time_end = format!("{}", dt.format("%+"));
         
         let body = serde_json::json!({
             "for_admin_panel": true,
             "uid": session_id.to_string(),
-            "time_end": time_end
+            "time_end": chrono::Local::now().to_rfc3339()
         });
         
         crate::common::post_request_sync(crate::ui_interface::get_api_server() + "/api/audit", body.to_string(), "")
